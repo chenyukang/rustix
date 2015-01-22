@@ -24,18 +24,23 @@ use core::str::StrExt;
 use core::marker::Copy;
 use super::spinlock::{Spinlock, DUMMY_LOCK, init_lock};
 
-pub const TASK_NUM: usize = 1024;
+
+pub static mut cpu: Cpu = Cpu {
+    id: 0us, started: 0us, ncli: 0is, intena: 0is,
+    cpu: 0 as *mut Cpu,
+    task: 0 as *mut Task};
 
 pub struct Cpu {
-    id: usize,      // Local APIC ID; index to cpus[] below
-    started: usize, // Has the CPU started?
-    ncli: isize,    // Depth of pushcli nesting.
-    intena: isize,  // Were interrupts enabled before pushcli?
+    pub id: usize,      // Local APIC ID; index to cpus[] below
+    pub started: usize, // Has the CPU started?
+    pub ncli: isize,    // Depth of pushcli nesting.
+    pub intena: isize,  // Were interrupts enabled before pushcli?
     cpu:  *mut Cpu, //
     task: *mut Task // The currently-running process.
 }
 
 
+pub const TASK_NUM: usize = 1024;
 pub enum ProcState { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE }
 
 pub struct Task {

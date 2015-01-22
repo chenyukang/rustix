@@ -21,10 +21,10 @@
 // SOFTWARE.
 
 use core::str::StrExt;
-use task::Cpu;
-use x86asm::{read_eflags, cli};
+use task::{Cpu, cpu};
 use mmu::FL_IF;
 use console::panic;
+use x86asm::{read_eflags, cli, sti};
 
 pub struct Spinlock {
 	locked: u32,
@@ -42,21 +42,62 @@ pub fn init_lock(lk: &mut Spinlock, name : &'static str) {
 
 impl Spinlock {
     pub fn holding(&self) -> bool {
-        self.locked == 1u32 // TODO: cpu
+        unsafe {
+            self.locked != 0 && self.cpu == (&mut cpu as *mut Cpu)
+        }
+    }
+
+    pub fn acquire(&mut self) {
+        pushcli();
+        if self.holding() {
+            panic("acquire");
+        }
+        //TODO
+        unsafe {
+            self.cpu = (&mut cpu as *mut Cpu);
+        }
+        //TODO
+    }
+
+    pub fn release(&mut self) {
+        if self.holding() {
+            panic("release");
+        }
+        //TODO
+        unsafe {
+            self.cpu = 0 as *mut Cpu;
+        }
+        //TODO
+        popcli();
     }
 }
 
 fn pushcli() {
     let eflags = read_eflags();
     cli();
+    unsafe {
+        if(cpu.ncli == 0) {
+            cpu.ncli += 1;
+            cpu.intena = (eflags & FL_IF) as isize;
+        }
+    }
 }
 
 fn popcli() {
-    // if (readeflags() & FL_IF) {
-    //     panic("popcli - interruptible");
-    // }
-    // if(--cpu->ncli < 0)
-    //     panic("popcli");
-    // if(cpu->ncli == 0 && cpu->intena)
-    //     sti();
+    let eflags = read_eflags();
+    if (eflags & FL_IF) != 0 {
+        panic("popcli - interruptible");
+    }
+    unsafe {
+        if(cpu.ncli < 0) {
+            panic("popcli");
+        }
+        if(--cpu.ncli < 0) {
+            panic("popcli");
+        }
+        if(cpu.ncli == 0 && cpu.intena != 0) {
+            sti();
+        }
+    }
+
 }

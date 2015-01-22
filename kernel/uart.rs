@@ -20,17 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use super::x86asm::outb;
-use super::x86asm::inb;
-use super::picirq::pic_enable;
-use super::traps::IRQ_COM1;
-
+use x86asm::outb;
+use x86asm::inb;
+use picirq::pic_enable;
+use traps::IRQ_COM1;
 use core::prelude::*;
 
-
-
-const COM1 : u16 = 0x3f8;
-static mut uart_initialized : bool = false;
+const COM1:u16 = 0x3f8;
+static mut uart_initialized: bool = false;
 
 
 pub fn early_init () {
@@ -50,14 +47,12 @@ pub fn early_init () {
 	unsafe {
 		uart_initialized = true;
 	}
-
 	uart_put_str("xv6 initizing...\n");
 }
 
 
 
-fn uartinit()
-{
+fn uartinit() {
 	unsafe {
 		if !uart_initialized {
 			return;

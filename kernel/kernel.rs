@@ -20,8 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
-
 #![crate_name = "kernel"]
 #![crate_type = "staticlib"]
 #![feature(lang_items, asm, intrinsics)]
@@ -57,9 +55,9 @@ fn main (end : u64) {
 #[no_mangle]
 pub extern "C" fn cmain(end : u64)  {
 	loop {
-	main(end);
+	    main(end);
 	}
-        //return 255;
+    //return 255;
 }
 
 
@@ -121,7 +119,6 @@ pub extern "C" fn fmaf()  {console::panic("fmaf: console::panic!!!");}
 pub extern "C" fn __powisf2()  {console::panic("__powisf2: console::panic!!!");}
 #[no_mangle]
 pub extern "C" fn __powidf2()  {console::panic("__powidf2: console::panic!!!");}
-
 
 
 #[lang = "stack_exhausted"] extern fn stack_exhausted() { loop {} }
